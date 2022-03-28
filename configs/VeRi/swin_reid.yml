@@ -1,0 +1,54 @@
+MODEL:
+  PRETRAIN_CHOICE: 'imagenet'
+  PRETRAIN_PATH: '/home/mhw/projects/SwinReid/pretrain/swin_base_patch4_window7_224.pth'
+  METRIC_LOSS_TYPE: 'triplet'
+  IF_LABELSMOOTH: 'off'
+  IF_WITH_CENTER: 'no'
+  NAME: 'swin'
+  NO_MARGIN: True
+  DEVICE_ID: ('0')
+INPUT:
+  SIZE_TRAIN: [ 224, 224 ]
+  SIZE_TEST: [ 224, 224 ]
+  PROB: 0.5 # random horizontal flip
+  RE_PROB: 0.5 # random erasing
+  PADDING: 10
+#  PIXEL_MEAN: [0.5, 0.5, 0.5]
+#  PIXEL_STD: [0.5, 0.5, 0.5]
+  PIXEL_MEAN: [0.485, 0.456, 0.406]
+  PIXEL_STD: [0.229, 0.224, 0.225]
+DATASETS:
+  NAMES: ('veri')
+  ROOT_DIR: ('/home/dataset/')
+DATALOADER:
+  SAMPLER: 'softmax_triplet'
+  NUM_INSTANCE: 4
+  NUM_WORKERS: 1
+SOLVER:
+  OPTIMIZER_NAME: 'SGD'
+  MAX_EPOCHS: 120
+  BASE_LR: 0.01
+#  这个就是正常的batchsize
+  IMS_PER_BATCH: 16
+  WARMUP_METHOD: 'linear'
+  LARGE_FC_LR: False
+#  CHECKPOINT_PERIOD: 120
+  CHECKPOINT_PERIOD: 20
+  LOG_PERIOD: 100
+#  EVAL_PERIOD: 120
+  EVAL_PERIOD: 10
+  WEIGHT_DECAY:  1e-4
+  WEIGHT_DECAY_BIAS: 1e-4
+  BIAS_LR_FACTOR: 2
+
+TEST:
+  EVAL: True
+  IMS_PER_BATCH: 256
+  RE_RANKING: False
+  WEIGHT: ''
+  NECK_FEAT: 'before'
+  FEAT_NORM: 'yes'
+
+OUTPUT_DIR: './logs/veri_swin_swinreid_circle'
+
+
