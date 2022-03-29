@@ -25,12 +25,12 @@ class CosineLRScheduler(Scheduler):
 
     def __init__(self,
                  optimizer: torch.optim.Optimizer,
-                 t_initial: int,
+                 t_initial: int, #120
                  t_mul: float = 1.,
-                 lr_min: float = 0.,
-                 decay_rate: float = 1.,
-                 warmup_t=0,
-                 warmup_lr_init=0,
+                 lr_min: float = 0., #1e-3
+                 decay_rate: float = 1., #0.1
+                 warmup_t=0,    # 5
+                 warmup_lr_init=0, #1e-4
                  warmup_prefix=False,
                  cycle_limit=0,
                  t_in_epochs=True,
@@ -51,10 +51,14 @@ class CosineLRScheduler(Scheduler):
                            "rate since t_initial = t_mul = eta_mul = 1.")
         self.t_initial = t_initial
         self.t_mul = t_mul
+        # 1e-3
         self.lr_min = lr_min
+        # 0.1
         self.decay_rate = decay_rate
         self.cycle_limit = cycle_limit
+        # 5
         self.warmup_t = warmup_t
+        # 1e-4
         self.warmup_lr_init = warmup_lr_init
         self.warmup_prefix = warmup_prefix
         self.t_in_epochs = t_in_epochs

@@ -25,12 +25,12 @@ def create_scheduler(cfg, optimizer):
 
     lr_scheduler = CosineLRScheduler(
             optimizer,
-            t_initial=num_epochs,
-            lr_min=lr_min,
+            t_initial=num_epochs, #120
+            lr_min=lr_min, #0.001 1e-3
             t_mul= 1.,
             decay_rate=0.1,
-            warmup_lr_init=warmup_lr_init,
-            warmup_t=warmup_t,
+            warmup_lr_init=warmup_lr_init, #0.0001 1e-4
+            warmup_t=warmup_t, # 5
             cycle_limit=1,
             t_in_epochs=True,
             noise_range_t=noise_range,

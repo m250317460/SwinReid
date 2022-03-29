@@ -6,6 +6,9 @@ from datasets import make_dataloader
 from model import make_model
 from solver import make_optimizer
 from solver.scheduler_factory import create_scheduler
+from torch.optim import lr_scheduler
+import torch.optim as optim
+
 from loss import make_loss
 from processor import do_train
 import random
@@ -88,24 +91,44 @@ if __name__ == '__main__':
     model = torch.nn.DataParallel(model).cuda()
 
     # 这里的loss函数使用了center和triplet两个，在person里面只使用了交叉熵和circle
-    loss_func, center_criterion = make_loss(cfg, num_classes=num_classes)
+    # loss_func, center_criterion = make_loss(cfg, num_classes=num_classes)
     # 使用center和triplet效果比较差，这边尝试用回交叉熵和circle，这边定义不用管，在训练的时候不使用就可以了
 
     # 优化器使用SGD
-    optimizer, optimizer_center = make_optimizer(cfg, model, center_criterion)
+    # optimizer, optimizer_center = make_optimizer(cfg, model, center_criterion)
 
-    scheduler = create_scheduler(cfg, optimizer)
+    # scheduler = create_scheduler(cfg, optimizer)
+    # 放弃使用cos更新算法,改用train中的setp固定值更新算法
 
+    # do_train(
+    #     cfg,
+    #     model,
+    #     center_criterion,
+    #     train_loader,
+    #     val_loader,
+    #     optimizer,
+    #     optimizer_center,
+    #     scheduler,
+    #     loss_func,
+    #     num_query,
+    #     args.local_rank
+    # )
+    optim_name = optim.SGD  # apex.optimizers.FusedSGD
+    ignored_params = list(map(id, model.classifier.parameters()))
+    base_params = filter(lambda p: id(p) not in ignored_params, model.parameters())
+    classifier_params = model.classifier.parameters()
+    optimizer_ft = optim_name([
+        {'params': base_params, 'lr': 0.1 * cfg.SOLVER.BASE_LR},
+        {'params': classifier_params, 'lr': cfg.SOLVER.BASE_LR}
+    ], weight_decay=5e-4, momentum=0.9, nesterov=True)
+    exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=cfg.SOLVER.MAX_EPOCHS * 2 // 3, gamma=0.1)
     do_train(
         cfg,
         model,
-        center_criterion,
         train_loader,
         val_loader,
-        optimizer,
-        optimizer_center,
-        scheduler,
-        loss_func,
+        optimizer_ft,
+        exp_lr_scheduler,
         num_query,
         args.local_rank
     )

@@ -49,6 +49,6 @@ TEST:
   NECK_FEAT: 'before'
   FEAT_NORM: 'yes'
 
-OUTPUT_DIR: './logs/veri_swin_swinreid_circle'
+OUTPUT_DIR: './logs/veri_swin_swinreid_steplr'
 
 
