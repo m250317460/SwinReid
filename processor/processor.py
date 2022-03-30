@@ -200,7 +200,7 @@ def do_train(cfg,
         loss_meter.reset()
         acc_meter.reset()
         evaluator.reset()
-        scheduler.step(epoch)
+        # scheduler.step(epoch)
         model.train()
         for n_iter, (img, vid, target_cam, target_view) in enumerate(train_loader):
             optimizer.zero_grad()
@@ -249,9 +249,14 @@ def do_train(cfg,
 
             torch.cuda.synchronize()
             if (n_iter + 1) % log_period == 0:
-                logger.info("Epoch[{}] Iteration[{}/{}] Loss: {:.3f}, Acc: {:.3f}, Base Lr: {:.2e}"
+                # logger.info("Epoch[{}] Iteration[{}/{}] Loss: {:.3f}, Acc: {:.3f}, Base Lr: {:.2e}"
+                #             .format(epoch, (n_iter + 1), len(train_loader),
+                #                     loss_meter.avg, acc_meter.avg, scheduler._get_lr(epoch)[0]))
+                logger.info("Epoch[{}] Iteration[{}/{}] Loss: {:.3f}, Acc: {:.3f}"
                             .format(epoch, (n_iter + 1), len(train_loader),
-                                    loss_meter.avg, acc_meter.avg, scheduler._get_lr(epoch)[0]))
+                                    loss_meter.avg, acc_meter.avg))
+
+        scheduler.step()
 
         end_time = time.time()
         time_per_batch = (end_time - start_time) / (n_iter + 1)
