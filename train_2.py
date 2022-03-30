@@ -88,7 +88,7 @@ if __name__ == '__main__':
     model = make_model(cfg, num_class=num_classes, camera_num=camera_num, view_num = view_num)
 
 
-    model = torch.nn.DataParallel(model).cuda()
+
 
     # 这里的loss函数使用了center和triplet两个，在person里面只使用了交叉熵和circle
     # loss_func, center_criterion = make_loss(cfg, num_classes=num_classes)
@@ -117,6 +117,7 @@ if __name__ == '__main__':
     ignored_params = list(map(id, model.classifier.parameters()))
     base_params = filter(lambda p: id(p) not in ignored_params, model.parameters())
     classifier_params = model.classifier.parameters()
+    model = torch.nn.DataParallel(model).cuda()
     optimizer_ft = optim_name([
         {'params': base_params, 'lr': 0.1 * cfg.SOLVER.BASE_LR},
         {'params': classifier_params, 'lr': cfg.SOLVER.BASE_LR}
